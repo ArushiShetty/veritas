@@ -6,7 +6,7 @@ export interface GeminiAnalysis {
   confidence: number;
 }
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT =
   'You are a forensic analyst. Analyze the image and return a JSON object with: { "status": "Real" | "AI" | "Digital Asset", "analysis_en": "...", "analysis_kn": "...", "analysis_hi": "...", "confidence": 0.85 }. Write Kannada and Hindi in a natural, spoken flow. Return only valid JSON with no markdown.';
@@ -101,6 +101,10 @@ export async function analyzeImageWithGemini(
     headers: { "Content-Type": "application/json" },
     body: requestBody,
   });
+
+  if (response.status === 429) {
+    throw new Error("Daily limit for AI analysis reached. Please try again in 24 hours or upgrade your API plan.");
+  }
 
   if (response.status === 503) {
     onRetry503?.();

@@ -94,7 +94,7 @@ const Profile = () => {
     };
     const { error } = await supabase
       .from('profiles')
-      .upsert(updates, { onConflict: ['user_id'] });
+      .upsert(updates, { onConflict: 'user_id' });
     if (error) {
       toast({ title: translations[language].updateError, variant: 'destructive' });
     } else {

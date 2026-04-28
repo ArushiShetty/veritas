@@ -199,6 +199,173 @@ export const helplineData = {
   "Guwahati": [
     {
       name: "Assam Women Commission",
+      number: "0361-2220013",
+      type: "Government",
+      email: "aswc@assam.gov.in"
+    },
+    {
+      name: "Police Women Helpline",
+      number: "181",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Patna": [
+    {
+      name: "Bihar Women Commission",
+      number: "0612-2214318",
+      type: "Government",
+      email: "bwc@bihar.gov.in"
+    },
+    {
+      name: "Women Helpline 181",
+      number: "181",
+      type: "Government",
+      email: null
+    }
+  ],
+  "Ranchi": [
+    {
+      name: "Jharkhand Women Commission",
+      number: "0651-2490036",
+      type: "Government",
+      email: "jswc@jharkhand.gov.in"
+    },
+    {
+      name: "Jharkhand Police Women Helpline",
+      number: "181",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Raipur": [
+    {
+      name: "Chhattisgarh Women Commission",
+      number: "0771-2511215",
+      type: "Government",
+      email: "cswc@chhattisgarh.gov.in"
+    },
+    {
+      name: "Women Helpline 181",
+      number: "181",
+      type: "Government",
+      email: null
+    }
+  ],
+  "Dehradun": [
+    {
+      name: "Uttarakhand Women Commission",
+      number: "0135-2661813",
+      type: "Government",
+      email: "ukswc@uttarakhand.gov.in"
+    },
+    {
+      name: "Women Helpline 181",
+      number: "181",
+      type: "Government",
+      email: null
+    }
+  ],
+  "Shimla": [
+    {
+      name: "HP Women Commission",
+      number: "0177-2621004",
+      type: "Government",
+      email: "hpswc@hp.gov.in"
+    },
+    {
+      name: "HP Police Women Helpline",
+      number: "181",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Srinagar": [
+    {
+      name: "J&K Women Commission",
+      number: "0194-2479482",
+      type: "Government",
+      email: "jkswc@jk.gov.in"
+    },
+    {
+      name: "Women Helpline 181",
+      number: "181",
+      type: "Government",
+      email: null
+    }  ],
+  "Bhopal": [
+    {
+      name: "MP Police Women Helpline",
+      number: "1090",
+      type: "Police",
+      email: null
+    },
+    {
+      name: "Madhya Pradesh Women Commission",
+      number: "0755-2661805",
+      type: "Government",
+      email: "mpwc-bhopal@mp.gov.in"
+    }
+  ],
+  "Surat": [
+    {
+      name: "Gujarat Women Commission Helpline",
+      number: "181",
+      type: "Government",
+      email: null
+    },
+    {
+      name: "Surat Police Women Cell",
+      number: "0261-2463944",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Visakhapatnam": [
+    {
+      name: "Andhra Pradesh Women Commission",
+      number: "0863-2329090",
+      type: "Government",
+      email: "apwc-help@ap.gov.in"
+    },
+    {
+      name: "Vizag Police Women Helpline",
+      number: "1091",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Agra": [
+    {
+      name: "UP Police Women Helpline",
+      number: "1090",
+      type: "Police",
+      email: null
+    },
+    {
+      name: "Women Power Line Agra",
+      number: "0562-2260682",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Coimbatore": [
+    {
+      name: "Tamil Nadu Women Helpline",
+      number: "181",
+      type: "Government",
+      email: null
+    },
+    {
+      name: "Coimbatore Police Women Helpline",
+      number: "1091",
+      type: "Police",
+      email: null
+    }
+  ],
+  "Assam": [
+    {
+      name: "Assam Women Commission",
       number: "0361-2465668",
       type: "Government",
       email: "awc@assam.gov.in"

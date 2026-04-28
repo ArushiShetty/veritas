@@ -108,7 +108,7 @@ const Login = () => {
           await supabase.from('profiles').upsert({
             user_id: data.user.id,
             name: state.name,
-          }, { onConflict: ['user_id'] });
+          }, { onConflict: 'user_id' });
         }
 
         toast({
