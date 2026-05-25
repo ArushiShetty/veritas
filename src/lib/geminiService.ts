@@ -6,7 +6,7 @@ export interface GeminiAnalysis {
   confidence: number;
 }
 
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
+const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${import.meta.env.VITE_GEMINI_API_KEY}`;
 
 const SYSTEM_PROMPT =
   'You are a forensic analyst. Analyze the uploaded image for security/forensic markers and return a JSON object with: { "status": "Real" | "AI" | "Digital Asset", "result_en": "Full forensic analysis in English.", "result_kn": "Full forensic analysis in Kannada.", "result_hi": "Full forensic analysis in Hindi.", "confidence": 0.85 }. Write Kannada and Hindi in a natural, spoken flow. Return only valid JSON with no markdown.';

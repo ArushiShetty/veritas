@@ -4,6 +4,7 @@ import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import { FileText, CheckCircle, X, AlertTriangle, Shield } from 'lucide-react';
 import { useToast } from "@/components/ui/use-toast";
+import { Button } from '../components/ui/button';
 
 interface Question {
   id: number;
@@ -132,169 +133,235 @@ const Quiz = () => {
 
   const currentQuestion = questions[currentQuestionIndex];
 
+  const downloadCertificate = () => {
+    const certText = `
+==================================================
+        VERITAS DIGITAL SELF-DEFENSE
+==================================================
+           AWARENESS CERTIFICATE
+
+This certifies that a VERITAS user has successfully
+completed the Digital Self-Defense Quiz, demonstrating
+high proficiency in identifying online threats, romance
+scams, deepfakes, and harassment prevention.
+
+Awarded on: ${new Date().toLocaleDateString()}
+Final Score: ${score} / ${questions.length}
+Status: CERTIFIED DIGITAL DEFENDER
+--------------------------------------------------
+    VERITAS - Privacy, Security, Empowerment
+==================================================`;
+    const blob = new Blob([certText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `veritas-digital-defense-certificate.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast({
+      title: "Certificate Downloaded",
+      description: "Your digital safety certificate was saved successfully."
+    });
+  };
+
+  const handleCopyScore = () => {
+    const text = `I just scored ${score}/${questions.length} on the VERITAS Digital Self-Defense Quiz! Test your digital safety awareness at: ${window.location.origin}/quiz`;
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to clipboard",
+      description: "Your awareness score has been copied to your clipboard!"
+    });
+  };
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] text-gray-900 animate-fade-up">
       <Navigation />
 
-      <main className="flex-grow">
-        <div className="veritas-container">
-          <div className="max-w-3xl mx-auto">
-            <h1 className="page-title">Digital Self-Defense Quiz</h1>
-            <p className="text-center text-gray-600 mb-8">
-              Test your knowledge and learn essential skills to stay safe online.
+      <main className="flex-grow py-8">
+        <div className="veritas-container max-w-3xl">
+          <div className="text-center mb-8 animate-fade-up">
+            <h1 className="page-title text-veritas-purple font-extrabold flex items-center justify-center gap-2">
+              <Shield className="h-8 w-8 text-veritas-purple" /> Digital Self-Defense Quiz
+            </h1>
+            <p className="text-gray-600 max-w-xl mx-auto">
+              Test your safety knowledge and earn your shareable competence certificate.
             </p>
+          </div>
 
-            {!quizCompleted ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-6 shadow-md">
-                <div className="flex justify-between items-center mb-6">
-                  <span className="bg-veritas-purple text-white text-sm px-3 py-1 rounded-full">
-                    Question {currentQuestionIndex + 1} of {questions.length}
-                  </span>
-                  <span className="text-gray-600 text-sm font-medium">
-                    Score: {score}/{currentQuestionIndex + (showExplanation ? 1 : 0)}
-                  </span>
-                </div>
+          {!quizCompleted ? (
+            <div className="bg-white/95 backdrop-blur-sm rounded-2xl border border-veritas-purple/10 p-6 md:p-8 shadow-xl animate-scale-in">
+              <div className="flex justify-between items-center mb-6">
+                <span className="bg-veritas-purple text-white text-xs font-bold px-3 py-1.5 rounded-full uppercase tracking-wider">
+                  Question {currentQuestionIndex + 1} of {questions.length}
+                </span>
+                <span className="text-veritas-purple text-sm font-semibold">
+                  Score: {score}/{currentQuestionIndex + (showExplanation ? 1 : 0)}
+                </span>
+              </div>
 
-                <h2 className="text-xl font-semibold mb-6">{currentQuestion.text}</h2>
+              <h2 className="text-xl font-bold mb-6 text-gray-800 leading-snug">{currentQuestion.text}</h2>
 
-                <div className="space-y-3 mb-8">
-                  {currentQuestion.options.map((option, index) => (
-                    <div
-                      key={index}
-                      onClick={() => handleOptionSelect(index)}
-                      className={`p-4 rounded-lg border cursor-pointer transition-all ${
+              <div className="space-y-3 mb-8">
+                {currentQuestion.options.map((option, index) => (
+                  <div
+                    key={index}
+                    onClick={() => handleOptionSelect(index)}
+                    className={`p-4 rounded-xl border-2 cursor-pointer transition-all duration-300 transform active:scale-[0.99] flex items-center justify-between ${
+                      selectedOption === index
+                        ? showExplanation
+                          ? index === currentQuestion.correctAnswer
+                            ? "bg-green-50 border-green-500 text-green-950 shadow-inner"
+                            : "bg-red-50 border-red-500 text-red-950 shadow-inner"
+                          : "bg-veritas-lightPurple border-veritas-purple text-veritas-darkPurple scale-[1.01] shadow-md shadow-purple-500/10"
+                        : "bg-white border-gray-100 hover:border-veritas-purple/30 hover:bg-veritas-lightPurple/20 hover:scale-[1.005]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-sm ${
                         selectedOption === index
                           ? showExplanation
                             ? index === currentQuestion.correctAnswer
-                              ? "bg-green-50 border-green-300"
-                              : "bg-red-50 border-red-300"
-                            : "bg-veritas-lightPurple border-veritas-purple"
-                          : "bg-white border-gray-200 hover:bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center">
-                        <div className={`w-6 h-6 rounded-full flex items-center justify-center mr-3 ${
-                          selectedOption === index
-                            ? showExplanation
-                              ? index === currentQuestion.correctAnswer
-                                ? "bg-green-500 text-white"
-                                : "bg-red-500 text-white"
-                              : "bg-veritas-purple text-white"
-                            : "bg-gray-200 text-gray-600"
-                        }`}>
-                          {showExplanation && selectedOption === index ? (
-                            index === currentQuestion.correctAnswer ? (
-                              <CheckCircle className="h-4 w-4" />
-                            ) : (
-                              <X className="h-4 w-4" />
-                            )
+                              ? "bg-green-500 text-white"
+                              : "bg-red-500 text-white"
+                            : "bg-veritas-purple text-white animate-pulse"
+                          : "bg-gray-100 text-gray-500"
+                      }`}>
+                        {showExplanation && selectedOption === index ? (
+                          index === currentQuestion.correctAnswer ? (
+                            <CheckCircle className="h-4 w-4" />
                           ) : (
-                            <span className="text-xs">{String.fromCharCode(65 + index)}</span>
-                          )}
-                        </div>
-                        <span className={`${
-                          showExplanation && index === currentQuestion.correctAnswer
-                            ? "font-medium text-green-800"
-                            : ""
-                        }`}>
-                          {option}
-                        </span>
+                            <X className="h-4 w-4" />
+                          )
+                        ) : (
+                          <span>{String.fromCharCode(65 + index)}</span>
+                        )}
                       </div>
+                      <span className="font-semibold">{option}</span>
                     </div>
-                  ))}
-                </div>
 
-                {showExplanation && (
-                  <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-6">
-                    <div className="flex items-start">
-                      <Shield className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
-                      <div>
-                        <h3 className="font-medium text-blue-800 mb-1">Explanation</h3>
-                        <p className="text-sm text-blue-700">{currentQuestion.explanation}</p>
-                      </div>
+                    {showExplanation && index === currentQuestion.correctAnswer && (
+                      <span className="text-xs font-bold text-green-600 bg-green-100 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                        Correct Answer
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              {showExplanation && (
+                <div className="bg-blue-50 border-l-4 border-blue-500 rounded-r-xl p-4 mb-6 shadow-sm animate-scale-in">
+                  <div className="flex items-start">
+                    <Shield className="h-5 w-5 text-blue-500 mr-2.5 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <h3 className="font-bold text-blue-800 text-sm mb-0.5">Safety Intelligence Briefing</h3>
+                      <p className="text-sm text-blue-700 leading-relaxed">{currentQuestion.explanation}</p>
                     </div>
                   </div>
-                )}
+                </div>
+              )}
 
-                <div className="flex justify-between">
-                  {!showExplanation ? (
-                    <button onClick={handleCheckAnswer} className="btn-primary w-full">
-                      Check Answer
-                    </button>
-                  ) : (
-                    <button onClick={handleNextQuestion} className="btn-primary w-full">
-                      {currentQuestionIndex < questions.length - 1 ? "Next Question" : "Finish Quiz"}
-                    </button>
-                  )}
-                </div>
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl border border-gray-200 p-8 shadow-md text-center">
-                <div className="mb-6">
-                  {score >= questions.length * 0.8 ? (
-                    <div className="bg-green-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center">
-                      <Shield className="h-10 w-10 text-green-600" />
-                    </div>
-                  ) : score >= questions.length * 0.5 ? (
-                    <div className="bg-yellow-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center">
-                      <Shield className="h-10 w-10 text-yellow-600" />
-                    </div>
-                  ) : (
-                    <div className="bg-orange-100 rounded-full p-4 mx-auto w-20 h-20 flex items-center justify-center">
-                      <AlertTriangle className="h-10 w-10 text-orange-600" />
-                    </div>
-                  )}
-                </div>
-                
-                <h2 className="text-2xl font-bold mb-4">Quiz Completed!</h2>
-                
-                <div className="text-4xl font-bold text-veritas-purple mb-2">
-                  {score} / {questions.length}
-                </div>
-                <p className="text-gray-600 mb-6">
-                  {score >= questions.length * 0.8
-                    ? "Excellent! You have great digital safety knowledge."
-                    : score >= questions.length * 0.5
-                    ? "Good job! Keep learning to stay even safer online."
-                    : "You have some learning to do. Study the safety tips to improve your score!"}
-                </p>
-                
-                <div className="bg-veritas-lightPurple p-4 rounded-lg mb-8">
-                  <h3 className="text-lg font-medium mb-2 text-veritas-purple">Safety Tips Recap</h3>
-                  <ul className="text-left text-sm text-gray-700 space-y-2">
-                    <li className="flex items-start">
-                      <CheckCircle className="h-4 w-4 text-veritas-purple mr-2 mt-0.5" />
-                      Always verify the identity of people you meet online before sharing personal information
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-4 w-4 text-veritas-purple mr-2 mt-0.5" />
-                      Use strong, unique passwords for each of your online accounts
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-4 w-4 text-veritas-purple mr-2 mt-0.5" />
-                      Be wary of suspicious links, even from friends (their accounts might be compromised)
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-4 w-4 text-veritas-purple mr-2 mt-0.5" />
-                      Always meet new online contacts in public places and tell someone where you're going
-                    </li>
-                    <li className="flex items-start">
-                      <CheckCircle className="h-4 w-4 text-veritas-purple mr-2 mt-0.5" />
-                      Learn to identify AI-generated fake images and deepfakes
-                    </li>
-                  </ul>
-                </div>
-                
-                <div className="flex flex-col sm:flex-row justify-center gap-4">
-                  <button onClick={handleRestartQuiz} className="btn-primary">
-                    Restart Quiz
+              <div className="flex justify-between">
+                {!showExplanation ? (
+                  <button 
+                    onClick={handleCheckAnswer} 
+                    className="btn-primary w-full py-4 text-base font-bold tracking-wide uppercase shadow-lg hover:shadow-purple-500/20"
+                  >
+                    Lock In Answer
                   </button>
-                  <a href="/profile-guard" className="btn-outline">
-                    Try Profile Scanner
-                  </a>
-                </div>
+                ) : (
+                  <button 
+                    onClick={handleNextQuestion} 
+                    className="btn-primary w-full py-4 text-base font-bold tracking-wide uppercase shadow-lg hover:shadow-purple-500/20"
+                  >
+                    {currentQuestionIndex < questions.length - 1 ? "Proceed to Next Question" : "View Final Results"}
+                  </button>
+                )}
               </div>
-            )}
+            </div>
+          ) : (
+            <div className="bg-white rounded-2xl border border-veritas-purple/10 p-8 shadow-xl text-center animate-scale-in">
+              <div className="mb-6 flex justify-center">
+                {score >= questions.length * 0.8 ? (
+                  <div className="bg-green-100 border-2 border-green-200 rounded-full p-5 w-24 h-24 flex items-center justify-center animate-float">
+                    <Shield className="h-12 w-12 text-green-600" />
+                  </div>
+                ) : score >= questions.length * 0.5 ? (
+                  <div className="bg-yellow-100 border-2 border-yellow-200 rounded-full p-5 w-24 h-24 flex items-center justify-center animate-float">
+                    <Shield className="h-12 w-12 text-yellow-600" />
+                  </div>
+                ) : (
+                  <div className="bg-orange-100 border-2 border-orange-200 rounded-full p-5 w-24 h-24 flex items-center justify-center animate-pulse">
+                    <AlertTriangle className="h-12 w-12 text-orange-600" />
+                  </div>
+                )}
+              </div>
+              
+              <h2 className="text-3xl font-extrabold mb-2 text-gray-800">Quiz Completed!</h2>
+              
+              <div className="text-5xl font-extrabold text-veritas-purple mb-3 tracking-tight">
+                {score} / {questions.length}
+              </div>
+              <p className="text-gray-600 text-base max-w-md mx-auto mb-6">
+                {score >= questions.length * 0.8
+                  ? "Excellent! You possess advanced digital safety credentials."
+                  : score >= questions.length * 0.5
+                  ? "Good job! You have solid foundational knowledge. Study tips to stay safe."
+                  : "We recommend reviewing basic digital safety guides to safeguard your presence."}
+              </p>
+
+              {/* Action Toolbar */}
+              <div className="flex flex-wrap justify-center gap-3 mb-8">
+                <Button 
+                  onClick={downloadCertificate}
+                  className="bg-green-600 hover:bg-green-700 text-white font-bold px-5 py-3.5 rounded-xl shadow-md flex items-center gap-2 transition"
+                >
+                  <Shield className="h-4.5 w-4.5" /> Download Competence Certificate
+                </Button>
+                <Button 
+                  onClick={handleCopyScore}
+                  variant="outline"
+                  className="border-veritas-purple text-veritas-purple hover:bg-veritas-lightPurple font-bold px-5 py-3.5 rounded-xl transition"
+                >
+                  Share My Score
+                </Button>
+              </div>
+              
+              <div className="bg-veritas-lightPurple/60 border border-veritas-purple/10 p-5 rounded-2xl mb-8 text-left shadow-inner">
+                <h3 className="text-lg font-bold mb-3 text-veritas-purple flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5" /> Online Threat Defense Checklist
+                </h3>
+                <ul className="text-sm text-gray-700 space-y-2.5">
+                  <li className="flex items-start gap-2.5 font-medium">
+                    <span className="text-veritas-purple text-base mt-0.5">•</span>
+                    <span>Verify identity of digital contacts before disclosing personal data.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5 font-medium">
+                    <span className="text-veritas-purple text-base mt-0.5">•</span>
+                    <span>Adopt long, complex passphrases or leverage secure credential managers.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5 font-medium">
+                    <span className="text-veritas-purple text-base mt-0.5">•</span>
+                    <span>Treat high-pressure messages demanding immediate action or passwords as suspicious scams.</span>
+                  </li>
+                  <li className="flex items-start gap-2.5 font-medium">
+                    <span className="text-veritas-purple text-base mt-0.5">•</span>
+                    <span>Utilize VERITAS ProfileGuard and Face Check to audit questionable profiles.</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row justify-center gap-4">
+                <button onClick={handleRestartQuiz} className="btn-primary flex-1 py-3 text-sm tracking-wide font-bold uppercase">
+                  Re-Attempt Quiz
+                </button>
+                <a href="/profile-guard" className="btn-outline flex-1 py-3 text-sm tracking-wide font-bold uppercase text-center flex items-center justify-center">
+                  Try Profile Scanner
+                </a>
+              </div>
+            </div>
+          )}
             
             <div className="mt-10 bg-white rounded-xl border border-gray-200 p-6 shadow-md">
               <h2 className="text-xl font-semibold mb-4 text-veritas-purple">Why Digital Self-Defense Matters</h2>
@@ -338,7 +405,6 @@ const Quiz = () => {
                     </li>
                   </ul>
                 </div>
-              </div>
             </div>
           </div>
         </div>

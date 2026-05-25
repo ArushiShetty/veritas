@@ -145,8 +145,8 @@ const Login = () => {
     <div className="min-h-screen flex flex-col">
       <Navigation />
       
-      <main className="flex-grow bg-gray-50 flex justify-center items-center py-12">
-        <div className="max-w-md w-full p-6 bg-white rounded-xl shadow-md">
+      <main className="flex-grow bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] flex justify-center items-center py-12">
+        <div className="max-w-md w-full p-6 bg-white/95 backdrop-blur-sm border border-purple-100/40 rounded-xl shadow-xl">
           <div className="flex justify-center mb-6">
             <Shield className="h-12 w-12 text-veritas-purple" />
           </div>
@@ -184,13 +184,13 @@ const Login = () => {
               </>
             )}
           </Button>
-
+ 
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-gray-300" />
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">or</span>
+              <span className="px-2 bg-background text-gray-500">or</span>
             </div>
           </div>
 

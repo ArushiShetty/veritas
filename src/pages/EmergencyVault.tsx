@@ -119,7 +119,7 @@ interface VaultFile {
 
 const EmergencyVault = () => {
 
-  const { language } = useContext(VeritasUIContext);
+  const { language, user, loadingAuth } = useContext(VeritasUIContext);
   const [files, setFiles] = useState<VaultFile[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -127,30 +127,24 @@ const EmergencyVault = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchVaultFiles();
-  }, []);
+    if (!loadingAuth) {
+      if (user) {
+        fetchVaultFiles();
+      } else {
+        setIsLoading(false);
+      }
+    }
+  }, [loadingAuth, user]);
 
   const fetchVaultFiles = async () => {
     try {
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !userData.user) {
-        toast({
-          title: translations[language].authRequired,
-          description: translations[language].signInToAccess,
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-      
+      setIsLoading(true);
       const { data, error } = await supabase
         .from('vault_files')
         .select('*')
         .order('created_at', { ascending: false });
         
       if (error) throw error;
-      
       setFiles(data || []);
     } catch (error) {
       console.error('Error fetching vault files:', error);
@@ -313,10 +307,10 @@ const EmergencyVault = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] text-gray-900 animate-fade-up">
       <Navigation />
       
-      <main className="flex-grow bg-gray-50">
+      <main className="flex-grow">
         <div className="veritas-container py-8">
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold text-veritas-purple">{translations[language].title}</h1>
@@ -327,12 +321,23 @@ const EmergencyVault = () => {
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white/90 border border-purple-100/60 shadow-xl rounded-xl p-6 backdrop-blur-md">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">{translations[language].yourFiles}</h2>
                 
                 {isLoading ? (
                   <div className="flex justify-center items-center h-40">
                     <Loader2 className="h-8 w-8 animate-spin text-veritas-purple" />
+                  </div>
+                ) : !user ? (
+                  <div className="text-center py-10 border-2 border-dashed border-gray-200 rounded-lg bg-gray-50/50">
+                    <Lock className="mx-auto h-12 w-12 text-veritas-purple/70 mb-3 animate-pulse" />
+                    <h3 className="text-base font-semibold text-gray-800">Authentication Required</h3>
+                    <p className="text-sm text-gray-500 max-w-sm mx-auto mt-2 mb-4">
+                      Your Emergency Vault is highly encrypted. Please sign in to authenticate your cryptographic keys.
+                    </p>
+                    <a href="/signin" className="btn-primary inline-flex items-center text-sm">
+                      Sign In Now
+                    </a>
                   </div>
                 ) : files.length > 0 ? (
                   <div className="overflow-x-auto">
@@ -401,7 +406,7 @@ const EmergencyVault = () => {
             </div>
             
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="bg-white/90 border border-purple-100/60 shadow-xl rounded-xl p-6 mb-6 backdrop-blur-md">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">{translations[language].uploadNew}</h2>
                 
                 <div className="mb-4">

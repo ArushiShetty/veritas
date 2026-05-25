@@ -47,7 +47,7 @@ const VoiceAssistant = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-purple-50">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] text-gray-900 animate-fade-up">
       <Navigation />
       
       <div className="container mx-auto px-4 py-8 max-w-4xl">

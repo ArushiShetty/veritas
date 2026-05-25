@@ -80,67 +80,51 @@ const translations = {
 
 const Navigation = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState<any>(null);
   const navigate = useNavigate();
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const { language, user, profileName, loadingAuth } = useContext(VeritasUIContext);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    setUser(null);
     navigate('/');
   };
-  const { language } = useContext(VeritasUIContext);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const { data } = await supabase.auth.getUser();
-      setUser(data.user);
-    };
-    fetchUser();
-    // Listen for auth changes
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-    });
-    return () => {
-      listener?.subscription.unsubscribe();
-    };
-  }, []);
 
   return (
-    <nav className="shadow-md sticky top-0 z-50 bg-white dark:bg-gray-900">
-      <div className="container mx-auto px-4 md:px-6">
+    <nav className="shadow-sm sticky top-0 z-50 bg-background/80 dark:bg-gray-900/90 backdrop-blur-md border-b border-purple-100/40 dark:border-gray-800">
+      <div className="container mx-auto px-4 lg:px-6">
         <div className="flex justify-between items-center py-4">
-          <div className="flex items-center gap-8">
-            <Link to="/" className="flex items-center space-x-2 mr-8">
-              <Shield className="h-8 w-8 text-veritas-purple" />
-              <span className="text-xl font-bold text-veritas-purple">VERITAS</span>
+          <div className="flex items-center gap-4 lg:gap-6">
+            <Link to="/" className="flex items-center space-x-2 mr-2 lg:mr-4 whitespace-nowrap flex-shrink-0">
+              <Shield className="h-7 w-7 lg:h-8 lg:w-8 text-veritas-purple flex-shrink-0" />
+              <span className="text-lg lg:text-xl font-bold text-veritas-purple">VERITAS</span>
             </Link>
-            <div className="hidden md:flex gap-4 items-center">
-              <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].home}</Link>
-              <Link to="/profile-guard" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-3 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple">{translations[language].profileGuard}</Link>
-              <Link to="/chatbot" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].safetyAssistant}</Link>
-              <Link to="/voice-assistant" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors flex items-center gap-1 font-medium">
-                <Mic className="h-4 w-4" /> {translations[language].voice}
+            <div className="hidden md:flex gap-2 lg:gap-3 items-center">
+              <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].home}</Link>
+              <Link to="/profile-guard" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-2 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].profileGuard}</Link>
+              <Link to="/chatbot" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].safetyAssistant}</Link>
+              <Link to="/voice-assistant" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors flex items-center gap-1 font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">
+                <Mic className="h-3.5 w-3.5" /> {translations[language].voice}
               </Link>
-              <Link to="/face-check" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-3 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple">{translations[language].imageCheck}</Link>
-              <Link to="/vault" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].secureVault}</Link>
-              <Link to="/analyzer" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].safetyAnalyzer}</Link>
-              <Link to="/report" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-3 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple">{translations[language].report}</Link>
-              <Link to="/evidence" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].evidence}</Link>
-              <Link to="/quiz" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].quiz}</Link>
-              <Link to="/verify" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium">{translations[language].verify}</Link>
+              <Link to="/face-check" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-2 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].imageCheck}</Link>
+              <Link to="/vault" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].secureVault}</Link>
+              <Link to="/analyzer" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].safetyAnalyzer}</Link>
+              <Link to="/report" className="bg-gradient-to-r from-veritas-purple to-purple-400 text-white px-2 py-1.5 rounded shadow font-semibold hover:from-purple-600 hover:to-veritas-purple transition-colors border-2 border-veritas-purple text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].report}</Link>
+              <Link to="/evidence" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].evidence}</Link>
+              <Link to="/quiz" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].quiz}</Link>
+              <Link to="/verify" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple transition-colors font-medium text-xs lg:text-sm whitespace-nowrap flex-shrink-0">{translations[language].verify}</Link>
               {user ? (
                 <>
-                  <Link to="/profile" className="ml-4 font-medium text-veritas-purple underline">
-                    {translations[language].welcome} <ProfileName user={user} />
+                  <Link to="/profile" className="ml-1 lg:ml-2 font-medium text-veritas-purple underline text-xs lg:text-sm whitespace-nowrap flex-shrink-0">
+                    {translations[language].welcome} {profileName}
                   </Link>
-                  <button onClick={handleLogout} className="ml-2 btn-outline text-sm py-1.5 px-3 flex items-center">
-                    <LogOut className="h-4 w-4 mr-1" />
+                  <button onClick={handleLogout} className="ml-1 lg:ml-2 btn-outline text-xs py-1.5 px-2.5 flex items-center whitespace-nowrap flex-shrink-0">
+                    <LogOut className="h-3.5 w-3.5 mr-1" />
                     {translations[language].signOut}
                   </button>
                 </>
               ) : (
-                <Link to="/signin" className="btn-outline text-sm py-1.5 px-3 flex items-center">
-                  <LogIn className="h-4 w-4 mr-1" />
+                <Link to="/signin" className="btn-outline text-xs py-1.5 px-2.5 flex items-center whitespace-nowrap flex-shrink-0">
+                  <LogIn className="h-3.5 w-3.5 mr-1" />
                   {translations[language].signIn}
                 </Link>
               )}
@@ -161,7 +145,7 @@ const Navigation = () => {
       </div>
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-100 dark:border-gray-700 py-2">
+        <div className="md:hidden bg-background/95 dark:bg-gray-900/95 backdrop-blur-md border-t border-purple-100/30 dark:border-gray-700 py-2">
           <div className="container mx-auto px-4 flex flex-col space-y-3 py-3">
             <Link to="/" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple py-2 transition-colors" onClick={toggleMenu}>Home</Link>
             <Link to="/profile-guard" className="text-gray-700 dark:text-gray-200 hover:text-veritas-purple py-2 transition-colors" onClick={toggleMenu}>ProfileGuard</Link>

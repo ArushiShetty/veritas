@@ -7,35 +7,40 @@
 
 @layer base {
   :root {
-    --background: 258 43% 98%;
+    --background: 258 25% 95.5%;
     --foreground: 256 22% 12%;
-
+ 
     --card: 0 0% 100%;
     --card-foreground: 256 22% 12%;
-
+ 
     --popover: 0 0% 100%;
     --popover-foreground: 256 22% 12%;
-
+ 
     --primary: 255 35% 50%;
     --primary-foreground: 0 0% 100%;
-
+ 
     --secondary: 199 93% 48%;
     --secondary-foreground: 0 0% 100%;
-
-    --muted: 257 23% 94%;
+ 
+    --muted: 257 23% 92%;
     --muted-foreground: 257 8% 47%;
-
-    --accent: 257 23% 94%;
+ 
+    --accent: 257 23% 92%;
     --accent-foreground: 256 22% 12%;
-
+ 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 257 23% 85%;
-    --input: 257 23% 85%;
+ 
+    --border: 258 20% 89%;
+    --input: 258 20% 89%;
     --ring: 255 35% 50%;
-
+ 
     --radius: 0.75rem;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
   }
 
   * {
@@ -77,7 +82,7 @@
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-md hover:shadow-lg transition duration-300 ease-in-out border border-gray-100 p-6;
+    @apply bg-white/95 backdrop-blur-sm rounded-xl shadow-lg shadow-purple-900/[0.04] hover:shadow-xl hover:shadow-purple-900/[0.07] hover:scale-[1.005] transition-all duration-300 ease-in-out border border-purple-200/50 p-6;
   }
   
   .security-element {

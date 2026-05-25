@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Index from "./pages/Index";
 import ProfileGuard from "./pages/ProfileGuard";
 // import ProfileGuardScanner from "./pages/ProfileGuardScanner";
@@ -20,6 +20,7 @@ import SafetyAnalyzer from "./pages/SafetyAnalyzer";
 import VoiceAssistant from "./pages/VoiceAssistant";
 import Profile from "./pages/Profile";
 import { useEffect, useState, createContext } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +30,9 @@ export const VeritasUIContext = createContext({
   setLanguage: (_: string) => {},
   darkMode: false,
   setDarkMode: (_: boolean) => {},
+  user: null as any,
+  profileName: '',
+  loadingAuth: true,
 });
 
 const LANGUAGES = [
@@ -37,13 +41,27 @@ const LANGUAGES = [
   { code: 'kn', label: 'ಕನ್ನಡ' },
 ];
 
+// ScrollToTop component to reset window scroll position on route change
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [pathname]);
+  return null;
+};
+
 const App = () => {
   const [language, setLanguage] = useState(() => localStorage.getItem('veritas-lang') || 'en');
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('veritas-dark') === 'true');
+  const [user, setUser] = useState<any>(null);
+  const [profileName, setProfileName] = useState<string>('');
+  const [loadingAuth, setLoadingAuth] = useState(true);
+  
   // Persist language and theme
   useEffect(() => {
     localStorage.setItem('veritas-lang', language);
   }, [language]);
+  
   useEffect(() => {
     localStorage.setItem('veritas-dark', darkMode ? 'true' : 'false');
     if (darkMode) {
@@ -53,38 +71,126 @@ const App = () => {
     }
   }, [darkMode]);
 
+  // Auth and profile name loading & listening at root level to prevent navigation layout shift
+  useEffect(() => {
+    const fetchUserAndProfile = async () => {
+      try {
+        // 2-second timeout wrapper to prevent hanging on slow network or database responses
+        const { data } = await Promise.race([
+          supabase.auth.getUser(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Auth fetch timeout')), 2000))
+        ]) as any;
+
+        const currentUser = data.user;
+        setUser(currentUser);
+        
+        if (currentUser) {
+          const profilePromise = supabase
+            .from('profiles')
+            .select('name')
+            .eq('user_id', currentUser.id)
+            .single();
+
+          const { data: profile } = await Promise.race([
+            profilePromise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Profile fetch timeout')), 2000))
+          ]) as any;
+
+          if (profile?.name) {
+            setProfileName(profile.name);
+          } else {
+            setProfileName(currentUser.user_metadata?.name || currentUser.email || '');
+          }
+        } else {
+          setProfileName('');
+        }
+      } catch (error) {
+        console.warn("Auth user loading timed out or failed:", error);
+      } finally {
+        setLoadingAuth(false);
+      }
+    };
+
+    fetchUserAndProfile();
+
+    const { data: listener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      try {
+        const currentUser = session?.user || null;
+        setUser(currentUser);
+        if (currentUser) {
+          const profilePromise = supabase
+            .from('profiles')
+            .select('name')
+            .eq('user_id', currentUser.id)
+            .single();
+
+          const { data: profile } = await Promise.race([
+            profilePromise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('Profile fetch timeout')), 2000))
+          ]) as any;
+
+          if (profile?.name) {
+            setProfileName(profile.name);
+          } else {
+            setProfileName(currentUser.user_metadata?.name || currentUser.email || '');
+          }
+        } else {
+          setProfileName('');
+        }
+      } catch (error) {
+        console.warn("Auth state listener profile fetch failed or timed out:", error);
+      } finally {
+        setLoadingAuth(false);
+      }
+    });
+
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  // Stealth Escape Double-Press ESC
+  useEffect(() => {
+    let lastEscapeTime = 0;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        const currentTime = new Date().getTime();
+        if (currentTime - lastEscapeTime < 500) {
+          // Trigger stealth redirect, replacing history so back button is disabled
+          window.location.replace('https://www.wikipedia.org');
+        }
+        lastEscapeTime = currentTime;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <VeritasUIContext.Provider value={{ language, setLanguage, darkMode, setDarkMode }}>
-          <div className={darkMode ? 'dark bg-gray-900 text-white min-h-screen' : 'bg-white min-h-screen'}>
-            {/* Panic Button */}
-            <button
-              onClick={() => window.location.href = '/analyzer#helplines'}
-              style={{
-                position: 'fixed',
-                bottom: 24,
-                right: 24,
-                zIndex: 9999,
-                background: '#e11d48',
-                color: 'white',
-                border: 'none',
-                borderRadius: '9999px',
-                padding: '0.75rem 1.5rem',
-                fontWeight: 'bold',
-                fontSize: '1rem',
-                boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                cursor: 'pointer',
-                transition: 'background 0.2s',
-              }}
-              onMouseOver={e => (e.currentTarget.style.background = '#be123c')}
-              onMouseOut={e => (e.currentTarget.style.background = '#e11d48')}
-              aria-label="Quickly go to a safe page"
-            >
-              🚨 Panic
-            </button>
+        <VeritasUIContext.Provider value={{ language, setLanguage, darkMode, setDarkMode, user, profileName, loadingAuth }}>
+          <div className={darkMode ? 'dark bg-gray-900 text-white min-h-screen' : 'bg-background min-h-screen'}>
+            {/* Pulsing Stealth Panic Button */}
+            <div className="fixed bottom-6 right-6 z-[9999] flex flex-col items-end gap-2 group">
+              <span className="bg-gray-900/90 dark:bg-gray-100/95 text-white dark:text-gray-950 text-xs px-3 py-1.5 rounded-lg shadow-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none font-medium whitespace-nowrap border border-white/10">
+                Double-Press <span className="font-bold underline text-rose-400 dark:text-rose-600">ESC</span> key anywhere to hide site instantly
+              </span>
+              <button
+                onClick={() => window.location.href = '/analyzer#helplines'}
+                className="relative bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-full px-5 py-3 shadow-lg hover:shadow-rose-500/50 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 border border-rose-500/30 overflow-hidden animate-pulse-slow"
+                aria-label="Quickly go to a safe page"
+              >
+                <span className="absolute inset-0 bg-white/20 translate-y-full hover:translate-y-0 transition-transform duration-300 rounded-full" />
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white"></span>
+                </span>
+                <span className="relative font-bold text-sm tracking-wide uppercase">🚨 Quick Escape</span>
+              </button>
+            </div>
             {/* Global toggles bar */}
-            <div className={"w-full flex justify-end items-center gap-4 px-6 py-2 border-b bg-white/80 dark:bg-gray-900/80 sticky top-0 z-40"}>
+            <div className={"w-full flex justify-end items-center gap-4 px-6 py-2 border-b border-purple-100/30 bg-background/85 dark:bg-gray-900/80 backdrop-blur-md sticky top-0 z-40"}>
               <label htmlFor="veritas-lang" className="font-medium mr-1">🌐</label>
               <select
                 id="veritas-lang"
@@ -104,6 +210,7 @@ const App = () => {
             <Toaster />
             <Sonner />
             <BrowserRouter>
+              <ScrollToTop />
               <Routes>
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/login" element={<Login />} />

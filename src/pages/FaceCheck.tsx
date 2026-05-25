@@ -312,7 +312,7 @@ const FaceCheck = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] text-gray-900 animate-fade-up">
       <Navigation />
       
       <main className="flex-grow">

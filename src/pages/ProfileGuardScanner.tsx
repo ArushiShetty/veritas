@@ -116,7 +116,7 @@ const ProfileGuardScanner = () => {
   };
 
   return (
-    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-purple-100 via-white to-pink-100'}`}> 
+    <div className={`min-h-screen flex flex-col ${darkMode ? 'bg-gray-900 text-white' : 'bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4]'}`}> 
       <Navigation />
       <main className="flex-grow flex flex-col items-center justify-center py-8">
         {/* Global toggles are now in App bar */}

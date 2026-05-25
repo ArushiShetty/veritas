@@ -104,9 +104,9 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-[#E9E7F2] via-background to-[#F6F1F4] text-gray-900 animate-fade-up">
       <Navigation />
-      <main className="flex-grow bg-gray-50 flex justify-center items-center py-12">
+      <main className="flex-grow flex justify-center items-center py-12">
         <div className="max-w-md w-full p-6 bg-white rounded-xl shadow-md">
           <h1 className="text-2xl font-bold text-center text-veritas-purple mb-2">{translations[language].title}</h1>
           <p className="text-center text-gray-600 mb-6">{translations[language].subtitle}</p>
